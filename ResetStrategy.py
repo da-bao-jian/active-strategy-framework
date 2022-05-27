@@ -6,7 +6,7 @@ import UNI_v3_funcs
 import copy
 
 class ResetStrategy:
-    def __init__(self,model_data,alpha_param,tau_param,limit_parameter):
+    def __init__(self,model_data, alpha_param,tau_param,limit_parameter):
     
         self.alpha_param            = alpha_param
         self.tau_param              = tau_param
