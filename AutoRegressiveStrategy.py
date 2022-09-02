@@ -267,8 +267,8 @@ class AutoRegressiveStrategy:
         ## Sanity Checks
         # Make sure baseLower < baseUpper. If not make two tick
         if baseLower >= baseUpper:
-            baseLower = current_strat_obs.price_tick_current - current_strat_obs.tickSpacing
-            baseUpper = current_strat_obs.price_tick_current + current_strat_obs.tickSpacing
+            baseLower = current_strat_obs.price_tick - current_strat_obs.tickSpacing
+            baseUpper = current_strat_obs.price_tick + current_strat_obs.tickSpacing
         
         liquidity_placed_base   = int(UNI_v3_funcs.get_liquidity(current_strat_obs.price_tick_current,baseLower,baseUpper,current_strat_obs.liquidity_in_0, \
                                                                        current_strat_obs.liquidity_in_1,current_strat_obs.decimals_0,current_strat_obs.decimals_1))
