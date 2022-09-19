@@ -86,9 +86,9 @@ def get_pool_data_bigquery(contract_address,date_begin,date_end,decimals_0,decim
     """
     
     if network == 'mainnet':
-        resulting_data                       = download_bigquery_swap_data(contract_address.lower(),date_begin,date_end,network='ethereum',block_start=block_start,credentials)
+        resulting_data                       = download_bigquery_swap_data(contract_address.lower(),date_begin,date_end,network='ethereum',block_start=block_start,credentials=credentials)
     elif network == 'polygon':
-        resulting_data                       = download_bigquery_swap_data(contract_address.lower(),date_begin,date_end,network=network,   block_start=block_start,credentials)
+        resulting_data                       = download_bigquery_swap_data(contract_address.lower(),date_begin,date_end,network=network,   block_start=block_start,credentials=credentials)
     else:
         raise ValueError('Unsupported Network:'+network)
     
