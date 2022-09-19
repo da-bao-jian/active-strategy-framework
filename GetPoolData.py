@@ -12,7 +12,7 @@ import math
 # Pull Uniswap v3 pool data from Google Bigquery
 # Have options for Ethereum Mainnet and Polygon
 ##############################################################
-def download_bigquery_swap_data(contract_address,date_begin,date_end,network='ethereum',block_start=0):
+def download_bigquery_swap_data(contract_address,date_begin,date_end,network='ethereum',block_start=0,credentials=None):
     """
     Internal function to query Google Bigquery for the swap history of a Uniswap v3 pool between two dates starting from a particular block from Ethereum Mainnet. 
     Use GetPoolData.get_pool_data_bigquery which preprocesses the data in order to conduct simualtions with the Active Strategy Framework.
@@ -20,7 +20,10 @@ def download_bigquery_swap_data(contract_address,date_begin,date_end,network='et
     
     
     from google.cloud import bigquery
-    client = bigquery.Client()
+    if credentials is None:
+        client = bigquery.Client()
+    else:
+        credentials = client = bigquery.Client(credentials=credentials)
 
     query = """
             SELECT *
@@ -75,7 +78,7 @@ def download_bigquery_price_polygon(contract_address,date_begin,date_end,block_s
 
     return result
 
-def get_pool_data_bigquery(contract_address,date_begin,date_end,decimals_0,decimals_1,network='mainnet',block_start=0):
+def get_pool_data_bigquery(contract_address,date_begin,date_end,decimals_0,decimals_1,network='mainnet',block_start=0,credentials = None):
     
     """
     Queries Google Bigquery for the swap history of a Uniswap v3 pool between two dates starting from a particular block from either Ethereum Mainnet or Polygon.
@@ -83,9 +86,9 @@ def get_pool_data_bigquery(contract_address,date_begin,date_end,decimals_0,decim
     """
     
     if network == 'mainnet':
-        resulting_data                       = download_bigquery_swap_data(contract_address.lower(),date_begin,date_end,network='ethereum',block_start=block_start)
+        resulting_data                       = download_bigquery_swap_data(contract_address.lower(),date_begin,date_end,network='ethereum',block_start=block_start,credentials)
     elif network == 'polygon':
-        resulting_data                       = download_bigquery_swap_data(contract_address.lower(),date_begin,date_end,network=network,   block_start=block_start)
+        resulting_data                       = download_bigquery_swap_data(contract_address.lower(),date_begin,date_end,network=network,   block_start=block_start,credentials)
     else:
         raise ValueError('Unsupported Network:'+network)
     
