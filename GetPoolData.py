@@ -23,7 +23,7 @@ def download_bigquery_swap_data(contract_address,date_begin,date_end,network='et
     if credentials is None:
         client = bigquery.Client()
     else:
-        credentials = client = bigquery.Client(credentials=credentials)
+        client = bigquery.Client(credentials=credentials)
 
     query = """
             SELECT *
