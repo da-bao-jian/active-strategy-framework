@@ -211,7 +211,7 @@ class AutoRegressiveStrategy:
         #######################
         
         left_over_balance = (current_strat_obs.token_0_left_over + current_strat_obs.token_0_fees_uncollected) * current_strat_obs.price \
-                            + (current_strat_obs.token_1_left_over + current_strat_obs.token_0_fees_uncollected)                
+                            + (current_strat_obs.token_1_left_over + current_strat_obs.token_1_fees_uncollected)                
         
         if (left_over_balance > self.tokens_outside_reset * (LIMIT_ORDER_BALANCE + BASE_ORDER_BALANCE)):
             TOKENS_OUTSIDE_LARGE = True
@@ -241,7 +241,12 @@ class AutoRegressiveStrategy:
         # If a compound is necessary
         elif  TOKENS_OUTSIDE_LARGE:
             
-            if self.check_compound_possible(current_strat_obs):
+            try:
+                compound_possible = self.check_compound_possible(current_strat_obs)
+            except ZeroDivisionError:
+                compound_possible = False
+                        
+            if compound_possible:
                 # if price allows for a compound
                 current_strat_obs.compound_point = True
                 current_strat_obs.reset_reason = 'compound'
