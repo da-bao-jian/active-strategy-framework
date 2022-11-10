@@ -97,24 +97,16 @@ class StrategyObservation:
         fees_earned_token_1 = 0.0
 
         if len(relevant_swaps) > 0:
+            for i in range(len(self.liquidity_ranges)):
+                in_range   = (self.liquidity_ranges[i]['lower_bin_tick'] <= relevant_swaps['tick_swap']) & (self.liquidity_ranges[i]['upper_bin_tick'] >= relevant_swaps['tick_swap'])
+                token_0_in = relevant_swaps['token_in'] == 'token0'
 
-            # For every swap in this time period
-            for s in range(len(relevant_swaps)):
-                for i in range(len(self.liquidity_ranges)):
-                    in_range   = (self.liquidity_ranges[i]['lower_bin_tick'] <= relevant_swaps.iloc[s]['tick_swap']) and \
-                                 (self.liquidity_ranges[i]['upper_bin_tick'] >= relevant_swaps.iloc[s]['tick_swap'])
+                fraction_fees_earned_position = self.liquidity_ranges[i]['position_liquidity']/(self.liquidity_ranges[i]['position_liquidity'] + relevant_swaps['virtual_liquidity'])
 
-                    token_0_in = relevant_swaps.iloc[s]['token_in'] == 'token0'
+                fees_earned_token_0 += (in_range * token_0_in     * self.fee_tier * fraction_fees_earned_position * relevant_swaps['traded_in']).sum()
+                fees_earned_token_1 += (in_range * (1-token_0_in) * self.fee_tier * fraction_fees_earned_position * relevant_swaps['traded_in']).sum()
 
-                    # Low liquidity tokens can have zero liquidity after swap
-                    if relevant_swaps.iloc[s]['virtual_liquidity'] < 1e-9:
-                        fraction_fees_earned_position = 1
-                    else:
-                        fraction_fees_earned_position = self.liquidity_ranges[i]['position_liquidity']/(self.liquidity_ranges[i]['position_liquidity'] + relevant_swaps.iloc[s]['virtual_liquidity'])
-
-                    fees_earned_token_0 += in_range * token_0_in     * self.fee_tier * fraction_fees_earned_position * relevant_swaps.iloc[s]['traded_in']
-                    fees_earned_token_1 += in_range * (1-token_0_in) * self.fee_tier * fraction_fees_earned_position * relevant_swaps.iloc[s]['traded_in']
-
+        
         self.token_0_fees_uncollected += fees_earned_token_0
         self.token_1_fees_uncollected += fees_earned_token_1
 
