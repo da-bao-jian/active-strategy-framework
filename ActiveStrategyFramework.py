@@ -98,8 +98,8 @@ class StrategyObservation:
 
         if len(relevant_swaps) > 0:
             for i in range(len(self.liquidity_ranges)):
-                in_range   = (self.liquidity_ranges[i]['lower_bin_tick'] <= relevant_swaps['tick_swap']) & (self.liquidity_ranges[i]['upper_bin_tick'] >= relevant_swaps['tick_swap'])
-                token_0_in = relevant_swaps['token_in'] == 'token0'
+                in_range   = (self.liquidity_ranges[i]['lower_bin_tick'] <= relevant_swaps['tick_swap']) & (self.liquidity_ranges[i]['upper_bin_tick'] >= relevant_swaps['tick_swap']).astype(int)
+                token_0_in = (relevant_swaps['token_in'] == 'token0').astype(int)
 
                 fraction_fees_earned_position = self.liquidity_ranges[i]['position_liquidity']/(self.liquidity_ranges[i]['position_liquidity'] + relevant_swaps['virtual_liquidity'])
 
