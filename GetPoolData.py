@@ -171,7 +171,7 @@ def get_swap_data(contract_address,file_name,DOWNLOAD_DATA = True,network='mainn
             current_payload = generate_perp_price_payload(contract_address,current_id)
             response        = query_univ3_graph(current_payload,network=network)
             current_id = response['data']['positionChangeds'][-1]['timestamp']
-            finished = True if current_id < end_time else False
+            finished = True if float(current_id) < float(end_time) else False
 
           else:
             current_payload = generate_event_payload('swaps',contract_address,str(1000))
@@ -181,7 +181,7 @@ def get_swap_data(contract_address,file_name,DOWNLOAD_DATA = True,network='mainn
           if len(response) == 0:
               finished = True
 
-          request_swap.extend(response)
+          request_swap = request_swap.extend(response) if network != 'optimism-perp' else  [*request_swap, *response['data']['positionChangeds']]
                 
           with open('./data/'+file_name+'_swap.pkl', 'wb') as output:
               pickle.dump(request_swap, output, pickle.HIGHEST_PROTOCOL)
@@ -483,7 +483,7 @@ def get_price_data_bitquery(token_0_address,token_1_address,date_begin,date_end,
         with open('./data/'+file_name+'_1min.pkl', 'rb') as input:
             request = pickle.load(input)
       except:
-        print('No data found. Please set DOWNLOAD_DATA to True to download data from Bitquery.')
+        print('No data found in the local /data directory. Please set DOWNLOAD_DATA to True to download data from Bitquery.')
         return None
 
     # Prepare data for strategy:
@@ -639,77 +639,79 @@ def run_bitquery_query(query,api_token):
     
 if __name__ == '__main__':
 
-  ETH_UNI3_POOLs = {
-    'aave_usd':{
-      'quoteAddress':'0x4da27a545c0c5b758a6ba100e3a049001de870f5',
-      'baseAddress':'0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48'
-    },
-    'ape_usd':{
-      'quoteAddress':'0x4d224452801ACEd8B2F0aebE155379bb5D594381',
-      'baseAddress':'0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48'
-    },
-    'wavax_usd': {
-      'quoteAddress':'0x85f138bfEE4ef8e540890CFb48F620571d67Eda3',
-      'baseAddress':'0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48'
-    },
-    'wbnb_usd': {
-      'quoteAddress':'0x418D75f65a02b3D53B2418FB8E1fe493759c7605',
-      'baseAddress':'0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48'
-    },
-    'wbtc_usd': {
-      'quoteAddress':'0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599',
-      'baseAddress':'0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48'
-    },
-    'crv_usd': {
-      'quoteAddress':'0xD533a949740bb3306d119CC777fa900bA034cd52',
-      'baseAddress':'0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48'
-    },
-    'weth_usd': {
-      'quoteAddress':'0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2',
-      'baseAddress':'0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48'
-    },
-    'ftm_usd':{
-      'quoteAddress': '0x4E15361FD6b4BB609Fa63C81A2be19d873717870',
-      'baseAddress':'0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48'
-    },
-    'link_usd':{
-      'quoteAddress': '0x514910771AF9Ca656af840dff83E8264EcF986CA',
-      'baseAddress':'0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48'
-    },
-    'matic_usd':{
-      'quoteAddress': '0x7D1AfA7B718fb893dB30A3aBc0Cfc608AaCfeBB0',
-      'baseAddress':'0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48'
-    },
-    'near_usd':{
-      'quoteAddress': '0x85F17Cf997934a597031b2E18a9aB6ebD4B9f6a4',
-      'baseAddress':'0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48'
-    },
-    'sand_usd':{
-      'quoteAddress': '0x3845badAde8e6dFF049820680d1F14bD3903a5d0',
-      'baseAddress':'0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48'
-    },
-    'wsol_usd':{
-      'quoteAddress': '0xD31a59c85aE9D8edEFeC411D448f90841571b89c',
-      'baseAddress':'0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48'
-    }
-}
+#   ETH_UNI3_POOLs = {
+#     'aave_usd':{
+#       'quoteAddress':'0x4da27a545c0c5b758a6ba100e3a049001de870f5',
+#       'baseAddress':'0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48'
+#     },
+#     'ape_usd':{
+#       'quoteAddress':'0x4d224452801ACEd8B2F0aebE155379bb5D594381',
+#       'baseAddress':'0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48'
+#     },
+#     'wavax_usd': {
+#       'quoteAddress':'0x85f138bfEE4ef8e540890CFb48F620571d67Eda3',
+#       'baseAddress':'0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48'
+#     },
+#     'wbnb_usd': {
+#       'quoteAddress':'0x418D75f65a02b3D53B2418FB8E1fe493759c7605',
+#       'baseAddress':'0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48'
+#     },
+#     'wbtc_usd': {
+#       'quoteAddress':'0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599',
+#       'baseAddress':'0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48'
+#     },
+#     'crv_usd': {
+#       'quoteAddress':'0xD533a949740bb3306d119CC777fa900bA034cd52',
+#       'baseAddress':'0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48'
+#     },
+#     'weth_usd': {
+#       'quoteAddress':'0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2',
+#       'baseAddress':'0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48'
+#     },
+#     'ftm_usd':{
+#       'quoteAddress': '0x4E15361FD6b4BB609Fa63C81A2be19d873717870',
+#       'baseAddress':'0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48'
+#     },
+#     'link_usd':{
+#       'quoteAddress': '0x514910771AF9Ca656af840dff83E8264EcF986CA',
+#       'baseAddress':'0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48'
+#     },
+#     'matic_usd':{
+#       'quoteAddress': '0x7D1AfA7B718fb893dB30A3aBc0Cfc608AaCfeBB0',
+#       'baseAddress':'0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48'
+#     },
+#     'near_usd':{
+#       'quoteAddress': '0x85F17Cf997934a597031b2E18a9aB6ebD4B9f6a4',
+#       'baseAddress':'0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48'
+#     },
+#     'sand_usd':{
+#       'quoteAddress': '0x3845badAde8e6dFF049820680d1F14bD3903a5d0',
+#       'baseAddress':'0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48'
+#     },
+#     'wsol_usd':{
+#       'quoteAddress': '0xD31a59c85aE9D8edEFeC411D448f90841571b89c',
+#       'baseAddress':'0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48'
+#     }
+# }
 
 
-  BITQUERY_API_TOKEN = dotenv_values('.env').get('BITQUERY_API_TOKEN')
-  price_data_begin         = '2022-12-01'
-  price_data_end           = '2022-12-31'
-  # get_swap_data('0x8C835DFaA34e2AE61775e80EE29E2c724c6AE2BB','vETH',DOWNLOAD_DATA = True,network='optimism-perp')       
-  for pair, addrs in ETH_UNI3_POOLs.items():
-    try:
-      get_price_data_bitquery(
-          addrs['baseAddress'],
-          addrs['quoteAddress'],
-          price_data_begin,
-          price_data_end,
-          BITQUERY_API_TOKEN,
-          pair,
-          True
-      )
-    except Exception as e:
-      print(e)
-      continue
+#   BITQUERY_API_TOKEN = dotenv_values('.env').get('BITQUERY_API_TOKEN')
+#   price_data_begin         = '2022-12-01'
+#   price_data_end           = '2022-12-31'
+  end_date = "01/12/2022"
+  end_date=time.mktime(datetime.strptime(end_date, "%d/%m/%Y").timetuple())
+  get_swap_data('0x8C835DFaA34e2AE61775e80EE29E2c724c6AE2BB','vETH',DOWNLOAD_DATA = True,network='optimism-perp', end_time=end_date)       
+  # for pair, addrs in ETH_UNI3_POOLs.items():
+  #   try:
+  #     get_price_data_bitquery(
+  #         addrs['baseAddress'],
+  #         addrs['quoteAddress'],
+  #         price_data_begin,
+  #         price_data_end,
+  #         BITQUERY_API_TOKEN,
+  #         pair,
+  #         True
+  #     )
+  #   except Exception as e:
+  #     print(e)
+  #     continue
